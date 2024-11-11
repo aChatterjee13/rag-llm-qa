@@ -53,6 +53,8 @@ Download 2 models to run locally.
 ollama run llama3.2
 ollama run llama2
 
+Put the ConceptsofBiology.PDF in the data/ folder before any operation
+
 There are notebooks to help with understanding how the langchain framework is used
 1. Langchain API validation Checker
 2. RAG with Ollama Llama3.2 and FAISS vectorstore
