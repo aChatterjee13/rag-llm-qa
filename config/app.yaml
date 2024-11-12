@@ -1,0 +1,4 @@
+openai-api-key: "sk-proj*****"
+lanhchain-api-key: "lsv2_pt_*****"
+langchain_project: "rag-pipeline-v10"
+hugginngface_token : "hf_****"
