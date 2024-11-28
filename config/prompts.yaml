@@ -1,0 +1,21 @@
+llama_prompt : "Answer the questions based only on the provided context. Think step by step before providing a detailed answer. <context> {context} </context> Question: {messages}"
+hf_prompt_template : "Use the following piece of context to answer the questions asked. Provide the answer based on the context {context} Question:{question}"
+crag_prompt_template : "You are an assistant for question-answering tasks. \n
+                    Use the following pieces of retrieved context and your knowledge \n
+                    to given a concise answer to the question. \n
+                    If you don't know the answer, just say that you don't know. \n
+                    Question: {question} 
+                    Context: {context} 
+                    Answer:"
+crag_retrieval_grading : "You are a grader assessing relevance of a retrieved document to a user question. \n 
+        Here is the retrieved document: \n\n {document} \n\n
+        Here is the user question: {question} \n
+        If the document contains keywords related to the user question, grade it as relevant. \n
+        It does not need to be a stringent test. The goal is to filter out erroneous retrievals. \n
+        Give a binary score 'yes' or 'no' score to indicate whether the document is relevant to the question. \n
+        Provide the binary score as a JSON with a single key 'score' and no premable or explanation."
+
+rewrite_template: "You a question re-writer that converts an input question to a better \n 
+        and simpler version that is optimized for vector database retrieval. \n
+        Look at the initial question and formulate an improved yet simpler question. \n
+        Here is the initial question: \n\n {question}. \nImproved question with no preamble: \n"
