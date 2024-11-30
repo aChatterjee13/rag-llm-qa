@@ -9,4 +9,4 @@ def get_retriever():
         folder_path="data_index/indexed_data/", embeddings=hf1_embeddings,
         allow_dangerous_deserialization=True
     )
-    return VECTORSTORE.as_retriever(search_kwargs={"k": 4})
+    return VECTORSTORE.as_retriever()

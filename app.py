@@ -6,10 +6,10 @@ import uvicorn
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
-from langchain import hub
-from langchain_core.runnables import RunnablePassthrough
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.messages import HumanMessage
+# from langchain import hub
+# from langchain_core.runnables import RunnablePassthrough
+# from langchain_core.output_parsers import StrOutputParser
+# from langchain_core.messages import HumanMessage
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains.retrieval import create_retrieval_chain
 from langgraph.graph import END, StateGraph
@@ -20,10 +20,7 @@ from src.data_model import QueryRequest
 from src.retriever import get_retriever
 from src.crag_nodes import retrieve, grade_documents, generate
 from src.crag_nodes import transform_query, web_search, decide_to_generate
-
-from data_index.data_indexing import create_load_vectorstore
-
-from models.llm import OllamaLLM
+from models.llm import model_llama
 
 # Read the app.yaml file
 with open('config/app.yaml', encoding="utf-8") as file:
@@ -40,18 +37,12 @@ os.environ['TAVILY_API_KEY'] = config.get('tavily_token')
 def rag_response(query):
     ''' General RAG response'''
     # Create chains for normal RAG
-    retriver = get_retriever()
-    relevant_docs = retriver.invoke(query)
-    document_chain = create_stuff_documents_chain(OllamaLLM, prompt=get_prompt_template_llama())
-    response = document_chain.invoke(
-        {
-        "context": relevant_docs,
-        "messages": [
-            HumanMessage(content=query)
-        ]
-    }
-    )
-    print(response)
+
+    prompt = get_prompt_template_llama()
+    doc_chain = create_stuff_documents_chain(model_llama,prompt= prompt)
+    retriever = get_retriever()
+    retriever_chain = create_retrieval_chain(retriever, doc_chain)
+    response = retriever_chain.invoke({"input" : query})
     return response
 
 
@@ -108,8 +99,8 @@ async def corrective_rag(request: QueryRequest):
     """Endpoint definition for LLama Local LLM - Corrective RAG"""
     input_dict = {"question": request.query}
     response = crag_response().invoke(input_dict)
-    print(response)
-    #return response['result']
+    # print(response)
+    return response['generation']
 
 @app.post("/upload/")
 async def upload_file_and_index(file: UploadFile = File(...)):
@@ -119,7 +110,7 @@ async def upload_file_and_index(file: UploadFile = File(...)):
         content = await file.read()
         with open(f"data_index/{file.filename}", "wb") as f:
             f.write(content)
-        create_load_vectorstore(f"data_index/{file.filename}")
+        # create_load_vectorstore(f"data_index/{file.filename}")
         return JSONResponse(content={"message": f"File '{file.filename}' uploaded successfully"},
                             status_code=200)
     except Exception as e:
